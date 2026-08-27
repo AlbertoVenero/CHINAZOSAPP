@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview --host 0.0.0.0 --port $PORT"
+    "preview": "vite preview --host 0.0.0.0 --port ${PORT:-8080}",
+    "start": "serve -s dist -l ${PORT:-8080}"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.0",
@@ -20,7 +21,8 @@
     "lucide-react": "^1.31.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "recharts": "^2.10.3"
+    "recharts": "^2.10.3",
+    "serve": "^14.2.4"
   },
   "devDependencies": {
     "@types/node": "^24.13.3",

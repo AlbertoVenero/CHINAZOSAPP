@@ -1,13 +1,18 @@
 // src/services/ApiService.js
 class ApiService {
     constructor() {
-        this.URI = 'http://localhost:5000/api';
-        this.BASE_URL = 'http://localhost:5000';
+        const rawBaseUrl = import.meta.env?.VITE_API_URL || 'http://localhost:5000';
+        this.BASE_URL = rawBaseUrl.replace(/\/+$/, '');
+        this.URI = `${this.BASE_URL}/api`;
         this.UPLOADS_URL = `${this.BASE_URL}/uploads`;
     }
 
     getImageUrl(filename) {
         if (!filename) return undefined;
+        // Si ya es una URL completa (http/https), devolverla tal cual
+        if (filename.startsWith('http://') || filename.startsWith('https://')) {
+            return filename;
+        }
         return `${this.UPLOADS_URL}/${filename}`;
     }
 
@@ -16,7 +21,8 @@ class ApiService {
     }
 
     getEndpoint(path) {
-        return `${this.URI}${path}`;
+        const cleanPath = path.startsWith('/') ? path : `/${path}`;
+        return `${this.URI}${cleanPath}`;
     }
 }
 

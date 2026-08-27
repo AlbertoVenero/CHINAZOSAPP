@@ -9,6 +9,7 @@ node_modules/
 /Backend/.env
 /Frontend/.env
 !.env.example
+!Frontend/.env.example
 
 # Builds
 dist/
@@ -17,6 +18,7 @@ build/
 /Frontend/dist/
 /Frontend/.next/
 /Frontend/.cache/
+*.tsbuildinfo
 
 # Capacitor - Android e iOS
 /Frontend/android/

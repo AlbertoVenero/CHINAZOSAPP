@@ -6,6 +6,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useState } from 'react';
 // @ts-ignore
 import authService from '@/services/AuthService';
+// @ts-ignore
+import apiService from '@/services/ApiService';
 
 export const TopBar = () => {
   console.log('🔵 [TopBar] Renderizando componente');
@@ -157,7 +159,7 @@ export const TopBar = () => {
               <DropdownTrigger>
                 <Button isIconOnly variant="light" size="sm" className="flex-shrink-0">
                   <Avatar
-                    src={user?.foto ? `http://localhost:5000/uploads/${user.foto}` : undefined}
+                    src={user?.foto ? apiService.getImageUrl(user.foto) : undefined}
                     name={user?.alias || 'U'}
                     size="sm"
                     className="w-8 h-8"
@@ -246,7 +248,7 @@ export const TopBar = () => {
           <ModalBody>
             <div className="flex flex-col items-center gap-4 py-4">
               <Avatar
-                src={user?.foto ? `http://localhost:5000/uploads/${user.foto}` : undefined}
+                src={user?.foto ? apiService.getImageUrl(user.foto) : undefined}
                 name={user?.alias || 'U'}
                 className="w-24 h-24 text-2xl"
               />
