@@ -1,11 +1,11 @@
 // src/services/ApiService.js
 class ApiService {
     constructor() {
-        let rawBaseUrl = import.meta.env?.VITE_BACKEND_URL 
-                      || import.meta.env?.VITE_API_URL 
-                      || import.meta.env?.VITE_BACKEND_PRIVATE 
-                      || 'http://localhost:5000';
-        
+        let rawBaseUrl = import.meta.env?.VITE_BACKEND_URL
+            || import.meta.env?.VITE_API_URL
+            || import.meta.env?.VITE_BACKEND_PRIVATE
+            || 'http://localhost:5000';
+
         rawBaseUrl = (rawBaseUrl || '').toString().trim().replace(/\/+$/, '');
 
         // Si es un dominio público sin http/https (ej: mi-backend.up.railway.app)
@@ -21,6 +21,9 @@ class ApiService {
         this.BASE_URL = rawBaseUrl;
         this.URI = `${this.BASE_URL}/api`;
         this.UPLOADS_URL = `${this.BASE_URL}/uploads`;
+
+        console.log('✅ BASE_URL final:', this.BASE_URL);
+        console.log('✅ URI final:', this.URI);
     }
 
     getImageUrl(filename) {
