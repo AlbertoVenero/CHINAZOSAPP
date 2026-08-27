@@ -1,8 +1,24 @@
 // src/services/ApiService.js
 class ApiService {
     constructor() {
-        const rawBaseUrl = import.meta.env?.VITE_API_URL || 'http://localhost:5000';
-        this.BASE_URL = rawBaseUrl.replace(/\/+$/, '');
+        let rawBaseUrl = import.meta.env?.VITE_BACKEND_URL 
+                      || import.meta.env?.VITE_API_URL 
+                      || import.meta.env?.VITE_BACKEND_PRIVATE 
+                      || 'http://localhost:5000';
+        
+        rawBaseUrl = (rawBaseUrl || '').toString().trim().replace(/\/+$/, '');
+
+        // Si es un dominio público sin http/https (ej: mi-backend.up.railway.app)
+        if (rawBaseUrl && !rawBaseUrl.startsWith('http://') && !rawBaseUrl.startsWith('https://')) {
+            // Si es localhost o IP privada usar http, si es dominio en la nube usar https
+            if (rawBaseUrl.startsWith('localhost') || rawBaseUrl.startsWith('127.0.0.1')) {
+                rawBaseUrl = `http://${rawBaseUrl}`;
+            } else {
+                rawBaseUrl = `https://${rawBaseUrl}`;
+            }
+        }
+
+        this.BASE_URL = rawBaseUrl;
         this.URI = `${this.BASE_URL}/api`;
         this.UPLOADS_URL = `${this.BASE_URL}/uploads`;
     }
