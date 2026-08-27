@@ -1,0 +1,48 @@
+# Dependencias
+node_modules/
+/Backend/node_modules/
+/Frontend/node_modules/
+
+# Variables de entorno
+.env
+.env.*
+/Backend/.env
+/Frontend/.env
+!.env.example
+
+# Builds
+dist/
+build/
+/Frontend/build/
+/Frontend/dist/
+/Frontend/.next/
+/Frontend/.cache/
+
+# Capacitor - Android e iOS
+/Frontend/android/
+/Frontend/ios/
+/android/
+/ios/
+*.apk
+*.aab
+*.ipa
+
+# Logs y temporales
+*.log
+logs/
+*.tmp
+.DS_Store
+Thumbs.db
+
+# Editores
+.vscode/
+.idea/
+*.swp
+
+# Cobertura
+coverage/
+/Frontend/coverage/
+
+# Archivos compilados TypeScript
+*.js.map
+*.d.ts.map

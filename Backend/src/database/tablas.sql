@@ -1,0 +1,81 @@
+-- ============================================================
+CREATE DATABASE chinazos;
+-- ============================================================
+DROP TABLE IF EXISTS ganadores;
+DROP TABLE IF EXISTS votos;
+DROP TABLE IF EXISTS chinazos;
+DROP TABLE IF EXISTS sicarios;
+
+-- ============================================================
+-- CREAR TABLAS 
+-- ============================================================
+
+-- 1. Tabla de sicarios (usuarios con autenticación simple)
+CREATE TABLE sicarios (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(100) NOT NULL,
+    alias VARCHAR(50) NOT NULL UNIQUE,
+    foto VARCHAR(255),
+    password VARCHAR(255) NOT NULL, -- La contraseña será el alias por defecto
+    fecha_registro CHAR(10)
+);
+
+-- 2. Tabla de chinazos
+CREATE TABLE chinazos (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    quien_dijo_id INT NOT NULL,
+    chinazo TEXT NOT NULL,
+    fecha CHAR(10) NOT NULL,
+    anotado_por_id INT NOT NULL,
+    fecha_registro CHAR(10)
+);
+
+-- 3. Tabla de votos 
+CREATE TABLE votos (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    chinazo_id INT NOT NULL,
+    device_id VARCHAR(100) NOT NULL, 
+    fecha_voto CHAR(10),
+    fecha_registro CHAR(10),
+    UNIQUE KEY unique_voto_chinazo_device (chinazo_id, device_id)
+);
+
+-- 4. Tabla de ganadores
+CREATE TABLE ganadores (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    chinazo_id INT NOT NULL,
+    mes CHAR(7) NOT NULL,
+    total_votos INT NOT NULL,
+    total_votantes INT NOT NULL,
+    porcentaje DECIMAL(5,2) NOT NULL,
+    fecha_registro CHAR(10),
+    UNIQUE KEY unique_mes (mes)
+);
+
+-- ============================================================
+-- ÍNDICES PARA OPTIMIZAR CONSULTAS
+-- ============================================================
+
+-- Índices para chinazos
+CREATE INDEX idx_chinazos_fecha ON chinazos(fecha);
+CREATE INDEX idx_chinazos_quien_dijo ON chinazos(quien_dijo_id);
+CREATE INDEX idx_chinazos_anotado_por ON chinazos(anotado_por_id);
+
+-- Índices para votos
+CREATE INDEX idx_votos_chinazo ON votos(chinazo_id);
+CREATE INDEX idx_votos_device ON votos(device_id);
+CREATE INDEX idx_votos_fecha ON votos(fecha_voto);
+
+-- Índices para ganadores
+CREATE INDEX idx_ganadores_mes ON ganadores(mes);
+CREATE INDEX idx_ganadores_chinazo ON ganadores(chinazo_id);
+
+-- Índice para sicarios
+CREATE INDEX idx_sicarios_alias ON sicarios(alias);
+
+-- ============================================================
+-- DATOS DE PRUEBA 
+-- ============================================================
+
+INSERT INTO sicarios (nombre, alias, foto, password, fecha_registro) VALUES
+('victor', 'MATATAN', 'matatan.jfif', 'MATATAN', '2026/01/15');

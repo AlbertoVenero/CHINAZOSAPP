@@ -1,0 +1,37 @@
+{
+  "name": "CHINAZOOOO",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "oxlint",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.5.0",
+    "@capacitor/cli": "^8.5.0",
+    "@capacitor/core": "^8.5.0",
+    "@heroicons/react": "^2.2.0",
+    "@nextui-org/react": "^2.6.11",
+    "@types/recharts": "^1.8.29",
+    "framer-motion": "^13.0.0",
+    "lucide-react": "^1.31.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "recharts": "^2.10.3"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.3",
+    "@types/react": "18.3.12",
+    "@types/react-dom": "18.3.1",
+    "@vitejs/plugin-react": "^6.0.4",
+    "autoprefixer": "^10.5.4",
+    "oxlint": "^1.75.0",
+    "postcss": "^8.5.26",
+    "tailwindcss": "^3.4.19",
+    "typescript": "~6.0.2",
+    "vite": "^8.2.0"
+  }
+}
