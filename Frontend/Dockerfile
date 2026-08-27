@@ -31,4 +31,9 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 # Exponer puerto 80
 EXPOSE 80
 
+# Healthcheck básico para verificar que Nginx responde correctamente
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+    CMD wget --quiet --tries=1 --spider http://127.0.0.1:80/ || exit 1
+
+# Asegurar que Nginx escuche en 0.0.0.0:80 (todas las interfaces), requerido por Railway
 CMD ["nginx", "-g", "daemon off;"]
