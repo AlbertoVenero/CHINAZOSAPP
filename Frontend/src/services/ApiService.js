@@ -3,12 +3,19 @@ class ApiService {
     constructor() {
         const isBrowser = typeof window !== 'undefined';
         const currentOrigin = isBrowser ? window.location.origin : '';
+        const isRailway = isBrowser && (window.location.hostname.includes('railway.app') || window.location.hostname.includes('up.railway.app'));
 
-        // Si se ejecuta en Railway, utilizar el mismo origen para aprovechar el proxy inverso de Nginx (elimina CORS y bloqueo de cookies)
-        let rawBaseUrl = import.meta.env?.VITE_BACKEND_URL
-            || import.meta.env?.VITE_API_URL
-            || import.meta.env?.VITE_BACKEND_PRIVATE
-            || (isBrowser && window.location.hostname.includes('railway.app') ? currentOrigin : 'https://siatea.apure.gob.ve/backend');
+        let rawBaseUrl = '';
+
+        // Si estamos en Railway, SIEMPRE usar same-origin (el proxy de Nginx) para evitar CORS y bloqueo de cookies cross-site
+        if (isRailway) {
+            rawBaseUrl = currentOrigin;
+        } else {
+            rawBaseUrl = import.meta.env?.VITE_BACKEND_URL
+                || import.meta.env?.VITE_API_URL
+                || import.meta.env?.VITE_BACKEND_PRIVATE
+                || 'https://siatea.apure.gob.ve/backend';
+        }
 
         rawBaseUrl = (rawBaseUrl || '').toString().trim().replace(/\/+$/, '');
 
