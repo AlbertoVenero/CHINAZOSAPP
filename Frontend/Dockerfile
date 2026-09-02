@@ -38,11 +38,7 @@ COPY --from=build /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Exponer puertos comunes para Railway
-EXPOSE 80 8080
+EXPOSE 80 8080 3000
 
-# Healthcheck compatible con BusyBox de Alpine Linux
-HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
-    CMD wget -q -O /dev/null http://127.0.0.1:80/healthz || exit 1
-
-# Asegurar que Nginx escuche también en cualquier puerto dinámico inyectado por Railway ($PORT)
-CMD ["/bin/sh", "-c", "if [ -n \"$PORT\" ] && [ \"$PORT\" != \"80\" ] && [ \"$PORT\" != \"8080\" ] && [ \"$PORT\" != \"3000\" ]; then sed -i \"s/listen       80;/listen       80;\\n    listen       $PORT;/\" /etc/nginx/conf.d/default.conf; fi && exec nginx -g 'daemon off;'"]
+# Asegurar que Nginx se ejecute en primer plano sin wrappers que puedan fallar
+CMD ["nginx", "-g", "daemon off;"]
