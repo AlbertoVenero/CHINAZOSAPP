@@ -4,11 +4,11 @@ class ApiService {
         let rawBaseUrl = import.meta.env?.VITE_BACKEND_URL
             || import.meta.env?.VITE_API_URL
             || import.meta.env?.VITE_BACKEND_PRIVATE
-            || 'http://localhost:5000';
+            || 'https://siatea.apure.gob.ve/backend';
 
         rawBaseUrl = (rawBaseUrl || '').toString().trim().replace(/\/+$/, '');
 
-        // Si es un dominio público sin http/https (ej: mi-backend.up.railway.app)
+        // Si es un dominio público sin http/https (ej: siatea.apure.gob.ve/backend)
         if (rawBaseUrl && !rawBaseUrl.startsWith('http://') && !rawBaseUrl.startsWith('https://')) {
             // Si es localhost o IP privada usar http, si es dominio en la nube usar https
             if (rawBaseUrl.startsWith('localhost') || rawBaseUrl.startsWith('127.0.0.1')) {
@@ -18,12 +18,18 @@ class ApiService {
             }
         }
 
+        // Si la URL termina en /api, removerlo de la base para evitar duplicación (/api/api)
+        if (rawBaseUrl.endsWith('/api')) {
+            rawBaseUrl = rawBaseUrl.slice(0, -4);
+        }
+
         this.BASE_URL = rawBaseUrl;
         this.URI = `${this.BASE_URL}/api`;
         this.UPLOADS_URL = `${this.BASE_URL}/uploads`;
 
         console.log('✅ BASE_URL final:', this.BASE_URL);
         console.log('✅ URI final:', this.URI);
+        console.log('✅ UPLOADS final:', this.UPLOADS_URL);
     }
 
     getImageUrl(filename) {

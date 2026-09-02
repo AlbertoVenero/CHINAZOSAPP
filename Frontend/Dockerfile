@@ -3,10 +3,10 @@ FROM node:20-alpine AS build
 
 WORKDIR /app
 
-# Argumentos de compilación para variables de entorno de Vite
-ARG VITE_API_URL
-ARG VITE_BACKEND_URL
-ARG VITE_BACKEND_PRIVATE
+# Argumentos de compilación para variables de entorno de Vite con valor por defecto
+ARG VITE_API_URL=https://siatea.apure.gob.ve/backend
+ARG VITE_BACKEND_URL=https://siatea.apure.gob.ve/backend
+ARG VITE_BACKEND_PRIVATE=https://siatea.apure.gob.ve/backend
 
 ENV VITE_API_URL=$VITE_API_URL
 ENV VITE_BACKEND_URL=$VITE_BACKEND_URL

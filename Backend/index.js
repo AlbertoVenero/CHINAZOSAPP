@@ -16,6 +16,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 
+// ✅ PERMITIR COOKIES SEGURAS DETRÁS DE PROXY REVERSO NGINX (HTTPS)
+app.set('trust proxy', 1);
+
 // ✅ CONFIGURAR COOKIE-PARSER (ANTES DE LAS RUTAS)
 app.use(cookieParser());
 
@@ -25,6 +28,7 @@ const allowedOrigins = [
     "http://localhost:5173",
     "http://localhost:8080",
     "http://localhost:4173",
+    "https://chinazosapp.up.railway.app",
     process.env.FRONTEND_URL,
 ].filter(Boolean);
 
