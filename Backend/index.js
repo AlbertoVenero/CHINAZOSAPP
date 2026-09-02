@@ -41,11 +41,12 @@ app.use(
                 allowedOrigins.indexOf(origin) !== -1 ||
                 /^http:\/\/localhost:\d+$/.test(origin) ||
                 /^http:\/\/127\.0\.0\.1:\d+$/.test(origin) ||
-                (process.env.FRONTEND_URL && origin === process.env.FRONTEND_URL)
+                (process.env.FRONTEND_URL && origin === process.env.FRONTEND_URL) ||
+                origin.endsWith('.up.railway.app')
             ) {
                 return callback(null, true);
             }
-            return callback(null, true); // Permitir otros orígenes en desarrollo / proxy
+            return callback(null, false); // No arrojar Error para evitar 500 Internal Server Error
         },
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         credentials: true,

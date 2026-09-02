@@ -1,16 +1,19 @@
 // src/services/ApiService.js
 class ApiService {
     constructor() {
+        const isBrowser = typeof window !== 'undefined';
+        const currentOrigin = isBrowser ? window.location.origin : '';
+
+        // Si se ejecuta en Railway, utilizar el mismo origen para aprovechar el proxy inverso de Nginx (elimina CORS y bloqueo de cookies)
         let rawBaseUrl = import.meta.env?.VITE_BACKEND_URL
             || import.meta.env?.VITE_API_URL
             || import.meta.env?.VITE_BACKEND_PRIVATE
-            || 'https://siatea.apure.gob.ve/backend';
+            || (isBrowser && window.location.hostname.includes('railway.app') ? currentOrigin : 'https://siatea.apure.gob.ve/backend');
 
         rawBaseUrl = (rawBaseUrl || '').toString().trim().replace(/\/+$/, '');
 
-        // Si es un dominio público sin http/https (ej: siatea.apure.gob.ve/backend)
+        // Si es un dominio público sin http/https
         if (rawBaseUrl && !rawBaseUrl.startsWith('http://') && !rawBaseUrl.startsWith('https://')) {
-            // Si es localhost o IP privada usar http, si es dominio en la nube usar https
             if (rawBaseUrl.startsWith('localhost') || rawBaseUrl.startsWith('127.0.0.1')) {
                 rawBaseUrl = `http://${rawBaseUrl}`;
             } else {

@@ -3,10 +3,10 @@ FROM node:20-alpine AS build
 
 WORKDIR /app
 
-# Argumentos de compilación para variables de entorno de Vite con valor por defecto
-ARG VITE_API_URL=https://siatea.apure.gob.ve/backend
-ARG VITE_BACKEND_URL=https://siatea.apure.gob.ve/backend
-ARG VITE_BACKEND_PRIVATE=https://siatea.apure.gob.ve/backend
+# Argumentos de compilación opcionales para variables de entorno de Vite
+ARG VITE_API_URL
+ARG VITE_BACKEND_URL
+ARG VITE_BACKEND_PRIVATE
 
 ENV VITE_API_URL=$VITE_API_URL
 ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
@@ -24,7 +24,7 @@ COPY . .
 # Compilar proyecto
 RUN npm run build
 
-# Etapa 2: Servidor de producción ligero con Nginx
+# Etapa 2: Servidor de producción ligero con Nginx y Reverse Proxy
 FROM nginx:alpine
 
 # Fijar worker_processes a 1 y eliminar autotuning para evitar 72 workers ociosos
@@ -34,11 +34,11 @@ RUN sed -i 's/worker_processes.*/worker_processes 1;/' /etc/nginx/nginx.conf && 
 # Copiar archivos compilados
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Copiar configuración de Nginx con soporte para SPA
+# Copiar configuración de Nginx con soporte para SPA y proxy inverso
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Exponer puertos comunes para Railway
 EXPOSE 80 8080 3000
 
-# Asegurar que Nginx se ejecute en primer plano sin wrappers que puedan fallar
+# Asegurar que Nginx se ejecute en primer plano
 CMD ["nginx", "-g", "daemon off;"]
