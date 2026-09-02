@@ -27,41 +27,25 @@ RUN npm run build
 # Etapa 2: Servidor de producción ligero y seguro con Nginx
 FROM nginx:alpine
 
-# Puerto por defecto si Railway no inyecta la variable $PORT
+# Puerto por defecto (80) si Railway no inyecta la variable $PORT
 ENV PORT=80
 
-# Desactivar autotuning que genera decenas de workers en servidores multinúcleo
-ENV NGINX_ENTRYPOINT_WORKER_PROCESSES_AUTOTUNE=0
+# Eliminar el script de autotuning de workers para evitar que Nginx lance 72 workers
+RUN rm -f /docker-entrypoint.d/30-tune-worker-processes.sh
 
-# Asegurar que envsubst solo reemplace la variable PORT y no variables nativas de Nginx
+# Asegurar que envsubst solo reemplace la variable PORT y preserve variables internas de Nginx
 ENV NGINX_ENVSUBST_FILTER="PORT"
 
-# Instalar libcap para permitir enlazar a puertos <1024 siendo usuario no-root
-RUN apk add --no-cache libcap && \
-    setcap 'cap_net_bind_service=+ep' /usr/sbin/nginx
-
-# Copiar configuración principal de Nginx (1 worker process, rutas /tmp)
+# Copiar configuración principal de Nginx (fijando 1 solo worker process)
 COPY nginx.conf /etc/nginx/nginx.conf
 
-# Copiar plantilla del virtual host SPA (será procesada por el entrypoint de Nginx)
+# Copiar plantilla del virtual host SPA (será procesada por el entrypoint de Nginx con $PORT)
 COPY nginx.template.conf /etc/nginx/templates/default.conf.template
 
 # Copiar archivos compilados desde la etapa build
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Ajustar permisos para ejecución como usuario no-root (nginx UID 101)
-RUN chown -R nginx:nginx /usr/share/nginx/html && \
-    chown -R nginx:nginx /var/cache/nginx && \
-    chown -R nginx:nginx /var/log/nginx && \
-    chown -R nginx:nginx /etc/nginx/conf.d && \
-    chown -R nginx:nginx /etc/nginx/templates && \
-    touch /tmp/nginx.pid && \
-    chown -R nginx:nginx /tmp/nginx.pid
-
-# Usuario no privilegiado conforme a estándares DevOps (07_devops_standards.md)
-USER nginx
-
-# Exponer puerto para documentación
+# Exponer puerto para Railway
 EXPOSE 80
 
 # Comprobación de salud interna
