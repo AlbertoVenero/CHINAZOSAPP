@@ -37,12 +37,12 @@ COPY --from=build /app/dist /usr/share/nginx/html
 # Copiar configuración de Nginx con soporte para SPA
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Exponer puerto 80 para Railway
-EXPOSE 80
+# Exponer puertos comunes para Railway
+EXPOSE 80 8080
 
-# Healthcheck para verificar que Nginx responde en todas las interfaces
+# Healthcheck compatible con BusyBox de Alpine Linux
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
-    CMD wget --quiet --tries=1 --spider http://127.0.0.1:80/healthz || exit 1
+    CMD wget -q -O /dev/null http://127.0.0.1:80/healthz || exit 1
 
-# Asegurar que Nginx se ejecute en primer plano
-CMD ["nginx", "-g", "daemon off;"]
+# Asegurar que Nginx escuche también en cualquier puerto dinámico inyectado por Railway ($PORT)
+CMD ["/bin/sh", "-c", "if [ -n \"$PORT\" ] && [ \"$PORT\" != \"80\" ] && [ \"$PORT\" != \"8080\" ] && [ \"$PORT\" != \"3000\" ]; then sed -i \"s/listen       80;/listen       80;\\n    listen       $PORT;/\" /etc/nginx/conf.d/default.conf; fi && exec nginx -g 'daemon off;'"]
