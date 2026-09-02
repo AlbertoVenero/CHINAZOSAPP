@@ -73,28 +73,53 @@ app.use(morgan("dev"));
 const fs = require('fs');
 const uploadsDir = path.join(__dirname, "uploads");
 if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
+    try {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+    } catch (e) {
+        console.error("❌ Error al crear carpeta uploads:", e);
+    }
 }
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, "uploads/");
+        if (!fs.existsSync(uploadsDir)) {
+            try {
+                fs.mkdirSync(uploadsDir, { recursive: true });
+            } catch (e) {
+                return cb(e);
+            }
+        }
+        cb(null, uploadsDir);
     },
     filename: function (req, file, cb) {
         cb(null, file.originalname);
     }
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({ 
+    storage: storage,
+    limits: { fileSize: 25 * 1024 * 1024 } // 25MB
+});
 
 // ========== ENDPOINT PARA SUBIR IMÁGENES ==========
-app.post("/upload", upload.single("image"), (req, res) => {
-    if (!req.file) {
-        return res.status(400).send("No se subió ningún archivo.");
-    }
-    res.json({ 
-        message: "Imagen subida correctamente", 
-        filename: req.file.filename 
+app.post("/upload", (req, res) => {
+    upload.single("image")(req, res, (err) => {
+        if (err) {
+            console.error("❌ Error en Multer al subir archivo:", err);
+            return res.status(500).json({ 
+                error: "Error al guardar el archivo", 
+                message: err.message,
+                code: err.code 
+            });
+        }
+        if (!req.file) {
+            return res.status(400).json({ error: "No se subió ningún archivo." });
+        }
+        console.log(`✅ Imagen subida: ${req.file.filename} (${req.file.size} bytes)`);
+        res.json({ 
+            message: "Imagen subida correctamente", 
+            filename: req.file.filename 
+        });
     });
 });
 
