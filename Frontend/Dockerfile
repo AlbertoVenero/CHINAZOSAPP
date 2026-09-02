@@ -24,32 +24,25 @@ COPY . .
 # Compilar proyecto
 RUN npm run build
 
-# Etapa 2: Servidor de producción ligero y seguro con Nginx
+# Etapa 2: Servidor de producción ligero con Nginx
 FROM nginx:alpine
 
-# Puerto por defecto (80) si Railway no inyecta la variable $PORT
-ENV PORT=80
+# Fijar worker_processes a 1 y eliminar autotuning para evitar 72 workers ociosos
+RUN sed -i 's/worker_processes.*/worker_processes 1;/' /etc/nginx/nginx.conf && \
+    rm -f /docker-entrypoint.d/30-tune-worker-processes.sh
 
-# Eliminar el script de autotuning de workers para evitar que Nginx lance 72 workers
-RUN rm -f /docker-entrypoint.d/30-tune-worker-processes.sh
-
-# Asegurar que envsubst solo reemplace la variable PORT y preserve variables internas de Nginx
-ENV NGINX_ENVSUBST_FILTER="PORT"
-
-# Copiar configuración principal de Nginx (fijando 1 solo worker process)
-COPY nginx.conf /etc/nginx/nginx.conf
-
-# Copiar plantilla del virtual host SPA (será procesada por el entrypoint de Nginx con $PORT)
-COPY nginx.template.conf /etc/nginx/templates/default.conf.template
-
-# Copiar archivos compilados desde la etapa build
+# Copiar archivos compilados
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Exponer puerto para Railway
+# Copiar configuración de Nginx con soporte para SPA
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Exponer puerto 80 para Railway
 EXPOSE 80
 
-# Comprobación de salud interna
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget --quiet --tries=1 --spider http://127.0.0.1:${PORT}/healthz || exit 1
+# Healthcheck para verificar que Nginx responde en todas las interfaces
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+    CMD wget --quiet --tries=1 --spider http://127.0.0.1:80/healthz || exit 1
 
+# Asegurar que Nginx se ejecute en primer plano
 CMD ["nginx", "-g", "daemon off;"]
