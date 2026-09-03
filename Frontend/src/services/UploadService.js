@@ -20,8 +20,15 @@ class UploadService {
             });
             
             if (!response.ok) {
-                const error = await response.text();
-                throw new Error(`Error al subir imagen: ${error}`);
+                let errorDetail = `Error HTTP ${response.status}`;
+                try {
+                    const errorJson = await response.json();
+                    errorDetail = errorJson.message || errorJson.error || errorDetail;
+                } catch {
+                    const errorText = await response.text();
+                    if (errorText) errorDetail = errorText;
+                }
+                throw new Error(`Error al subir imagen: ${errorDetail}`);
             }
             
             const result = await response.json();
